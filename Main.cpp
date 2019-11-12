@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <iomanip>
 #include <vector>
+#include "Library.h"
 #include "Item.h"
 #include "Book.h"
 #include "Journal.h"
@@ -16,29 +17,20 @@ using namespace std;
 void run();
 void printMenu();
 void printSearchMenu();
-void searchCatalog(vector<Item*>);
-void printItemsByType(vector<Item*>, int);
-string itemTypeToString(int);
-int searchItemByName(vector<Item*>, string);
-int searchItemByAuthor(vector<Item*>, string);
-void createCatalog(vector<Item*>&);
+void printFound(Item*);
+void searchLibrary(Library);
 int selectItemType();
-void writeToCatalog(vector<Item*>&, int, string, string);
-void addToItems(vector<Item*>&, int, int, string, bool, string);
 void printTypeMenu();
-void printCatalog(const vector<Item*>);
 void checkOut();
 void checkIn();
-
-enum itemType { NONE, BOOK, JOURNAL, MAGAZINE };
+void printFound(Item*);
 
 void run() {
-	vector<Item*> items;
+	Library lib;
 	string trash = "";
 	int action = 0;
 
-	createCatalog(items);
-	printCatalog(items);
+	lib.printItems();
 	while (true)
 	{
 		try
@@ -52,7 +44,7 @@ void run() {
 			cout << endl;
 
 			if (action == 1) {
-				searchCatalog(items);
+				searchLibrary(lib);
 			}
 			else if (action == 2) {
 
@@ -69,20 +61,20 @@ void run() {
 				getline(cin, name);
 
 				string other;
-				if (type == BOOK) {
+				if (type == lib.BOOK) {
 					cout << "Enter the author: ";
 					getline(cin, other);
 				}
-				else if (type == JOURNAL) {
+				else if (type == lib.JOURNAL) {
 					cout << "Enter the volume: ";
 					cin >> other;
 				}
-				else if (type == MAGAZINE) {
+				else if (type == lib.MAGAZINE) {
 					cout << "Enter the issue number: ";
 					cin >> other;
 				}
-				writeToCatalog(items, type, name, other);
-				printCatalog(items);
+				lib.addItem(type, name, other);
+				lib.printItems();
 			}
 			else if (action == 5) {
 				return;
@@ -114,7 +106,7 @@ void printSearchMenu() {
 	cout << endl;
 }
 
-void searchCatalog(vector<Item*> items) {
+void searchLibrary(Library lib) {
 	int searchType = 0;
 	string trash = "";
 
@@ -140,119 +132,35 @@ void searchCatalog(vector<Item*> items) {
 		cout << "Enter the name of the item: ";
 		getline(cin, name);
 		cout << endl;
-		int index = searchItemByName(items, name);
-		if (index == -1) {
-			cout << "Item not found." << endl;
-		}
-		else {
-			cout << "Item found!" << endl;
-			items[index]->print();
-		}
+		Item* tempItem = lib.searchItemByName(name);
+		printFound(tempItem);
 		cout << endl;
 	}
 	else if (searchType == 2) {
 		int type;
 		type = selectItemType();
-		cout << "\nCategory Selected: " << itemTypeToString(type) << endl;
-		printItemsByType(items, type);
+		cout << "\nCategory Selected: " << lib.itemTypeToString(type) << endl;
+		lib.printItemsByType(type);
 	}
 	else if (searchType == 3) {
 		string author;
 		cout << "Enter the name of the author: ";
 		getline(cin, author);
 		cout << endl;
-		int index = searchItemByAuthor(items, author);
-		if (index == -1) {
-			cout << "Item not found." << endl;
-		}
-		else {
-			cout << "Item found!" << endl;
-			items[index]->print();
-		}
+		Item* tempItem = lib.searchItemByAuthor(author);
+		printFound(tempItem);
 		cout << endl;
 	}
 }
 
-void printItemsByType(vector<Item*> items, int type){
-	for (size_t i = 0; i < items.size(); i++) {
-		if (items[i]->getType() == type) {
-			items[i]->print();
-		}
-	}
-	cout << endl;
-}
-
-string itemTypeToString(int type) {
-	if (type == BOOK) {
-		return "Book";
-	}
-	else if (type == JOURNAL) {
-		return "Journal";
-	}
-	else if (type == MAGAZINE) {
-		return "Magazine";
+void printFound(Item * tempItem)
+{
+	if (tempItem == NULL) {
+		cout << "Item not found." << endl;
 	}
 	else {
-		return "Invalid item type";
-	}
-}
-
-int searchItemByName(vector<Item*> items, string name) {
-	for (size_t i = 0; i < items.size(); i++) {
-		if (items[i]->getName() == name) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-int searchItemByAuthor(vector<Item*> items, string author) {
-	for (size_t i = 0; i < items.size(); i++) {
-		if (items[i]->getType() == BOOK) {
-			Book* b = static_cast<Book*>(items[i]);
-			if (b->getAuthor() == author) {
-				return i;
-			}
-		}
-	}
-	return -1;
-}
-
-void createCatalog(vector<Item*> &items) { //items from text file to vector
-	int type;
-	int id;
-	string name;
-	bool status;
-	string other;
-
-	ifstream inFile;
-	const string fileName = "Catalog.txt";
-
-	inFile.open(fileName);
-	if (!inFile.is_open()){
-		cout << "Error: unable to open file '"
-		<< fileName << endl << endl;
-	}
-
-	string line = "";
-	while (inFile.good())
-	{
-		try {
-			getline(inFile, line, ';');
-			type = stoi(line);
-			getline(inFile, line, ';');
-			id = stoi(line);
-			getline(inFile, line, ';');
-			name = line;
-			getline(inFile, line, ';');
-			status = stoi(line);
-			getline(inFile, line, ';');
-			other = line;
-
-			addToItems(items, id, type, name, status, other);
-		}
-		catch (...) {
-		}
+		cout << "Item found!" << endl;
+		tempItem->print();
 	}
 }
 
@@ -274,34 +182,6 @@ int selectItemType() {
 	return type;
 }
 
-void writeToCatalog(vector<Item*> &items, int type, string name, string other) { //add new item
-	
-	int id = items.size(); //default
-	bool status = true; //default (checked-in)
-
-	const string fileName = "Catalog.txt";
-
-	cout << endl;
-	addToItems(items, id, type, name, status, other);
-	items[id]->writeToFile(fileName);
-	
-}
-
-void addToItems(vector<Item*> &items, int id, int type, string name, bool status, string other) { //add to vector 'items'
-
-	if (type == BOOK) {
-		Book* b = new Book(id, name, status, other);
-		items.push_back(b);
-	}
-	else if (type == JOURNAL) {
-		Journal* j = new Journal(id, name, status, stoi(other));
-		items.push_back(j);
-	}
-	else if (type == MAGAZINE) {
-		Magazine* m = new Magazine(id, name, status, stoi(other));
-		items.push_back(m);
-	}
-}
 
 void printTypeMenu() {
 	cout << "1. Book" << endl;
@@ -311,12 +191,7 @@ void printTypeMenu() {
 	cout << endl;
 }
 
-void printCatalog(const vector<Item*> items) {
-	for (size_t i = 0; i < items.size(); i++) {
-		items[i]->print();
-	}
-	cout << endl;
-}
+
 
 void checkOut() {
 
