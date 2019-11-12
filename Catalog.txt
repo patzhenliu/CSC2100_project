@@ -1,0 +1,7 @@
+1;0;The Great Gatsby;1;F. Scott Fitzgerald;
+2;1;Journal of Medicine;1;4;
+3;2;Time;1;96;
+1;3;A Farewell to Arms;1;Ernest Hemingway;
+1;4;Of Mice and Men;1;John Steinbeck;
+1;5;ausdhuiasdh asd;1;h2u3 f;
+2;6;Cool Magazine yay;1;5;
