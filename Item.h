@@ -18,6 +18,8 @@ public:
 	int getId() const;
 	string getName() const;
 	bool getStatus() const;
+	virtual string toString() = 0;
+	void setStatus(bool);
 
 private:
 	int id;

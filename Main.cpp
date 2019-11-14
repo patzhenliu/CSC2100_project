@@ -17,64 +17,102 @@ using namespace std;
 void run();
 void printMenu();
 void printSearchMenu();
-void printFound(Item*);
-void searchLibrary(Library);
+void printFoundItems(vector<Item*>);
+vector<Item*> getSearchItems(Library);
 int selectItemType();
 void printTypeMenu();
-void checkOut();
-void checkIn();
-void printFound(Item*);
+void printIsFound(Item*);
+int getIntInput();
+int getIntInput(int, int);
+void checkingIO(Library, bool);
+void printfLine();
+
+void printfLine() {
+	cout << setw(50) << setfill('=') << "" << endl << endl;
+	cout << setfill(' ');
+}
+
+void checkingIO(Library lib, bool isCheckingIn) {
+	int id;
+	cout << "Enter item ID to return: ";
+	id = getIntInput(-1, lib.getSize());
+
+	if (id != NULL) {
+		if (!lib.isCheckedIn(id) && isCheckingIn) { //if checked out and is checking in
+			lib.checkIn(id);
+			cout << "The following item has been returned:" << endl;
+			lib.getItem(id)->print();
+		}
+		else if (lib.isCheckedIn(id) && !isCheckingIn) { //if checked in and is checking out
+			lib.checkOut(id);
+			cout << "The following item has been checked out:" << endl;
+			lib.getItem(id)->print();
+		}
+		else { //checked in
+			cout << "This item is already checked " << (isCheckingIn? "in":"out") << endl;
+		}
+		cout << endl;
+	}
+}
 
 void run() {
 	Library lib;
 	string trash = "";
 	int action = 0;
 
+	const bool isCheckingIn = true;
+	const bool isCheckingOut = not isCheckingIn;
+
 	lib.printItems();
 	while (true)
 	{
 		try
 		{
-			cout << setw(50) << setfill('=') << "" << endl << endl;
-			cout << setfill(' ');
+			printfLine();
 			printMenu();
 			cout << "\nPlease select a menu option: ";
-			cin >> action;
-			getline(cin, trash);
-			cout << endl;
+			action = getIntInput();
 
 			if (action == 1) {
-				searchLibrary(lib);
+				vector<Item*> vect = getSearchItems(lib);
+				printFoundItems(vect);
+				
 			}
 			else if (action == 2) {
+				checkingIO(lib, isCheckingOut);
 
 			}
 			else if (action == 3) {
-
+				checkingIO(lib, isCheckingIn);
 			}
 			else if (action == 4) {
 				int type; //prompted
 				string name = ""; //prompted
 
 				type = selectItemType();
-				cout << "Enter the title: ";
-				getline(cin, name);
 
-				string other;
-				if (type == lib.BOOK) {
-					cout << "Enter the author: ";
-					getline(cin, other);
+				if (type != 4) {
+					cout << "Enter the title: ";
+					getline(cin, name);
+
+					string other;
+
+					if (type == lib.BOOK) {
+						cout << "Enter the author: ";
+						getline(cin, other);
+					}
+					else if (type == lib.JOURNAL) {
+						cout << "Enter the volume: ";
+						cin >> other;
+					}
+					else if (type == lib.MAGAZINE) {
+						cout << "Enter the issue number: ";
+						cin >> other;
+					}
+					cout << endl;
+					lib.addItem(type, name, other);
+					lib.printItems();
 				}
-				else if (type == lib.JOURNAL) {
-					cout << "Enter the volume: ";
-					cin >> other;
-				}
-				else if (type == lib.MAGAZINE) {
-					cout << "Enter the issue number: ";
-					cin >> other;
-				}
-				lib.addItem(type, name, other);
-				lib.printItems();
 			}
 			else if (action == 5) {
 				return;
@@ -86,6 +124,10 @@ void run() {
 			cin.clear();
 			getline(cin, trash);
 		}
+	}
+	for (size_t i = 0; i < lib.getItems().size(); i++) { //was being called too often in Library destructor, FIX
+		delete lib.getItems()[i];
+		lib.getItems()[i] = 0;
 	}
 }
 
@@ -106,77 +148,61 @@ void printSearchMenu() {
 	cout << endl;
 }
 
-void searchLibrary(Library lib) {
-	int searchType = 0;
+vector<Item*> getSearchItems(Library lib) { //returns list of items that match
+	int searchType = NULL;
 	string trash = "";
 
-	while (searchType < 1 || searchType > 4) {
+	while (searchType == NULL) {
 		printSearchMenu();
 		cout << "Enter an option: ";
-		cin >> searchType;
-		if (cin.fail())
-		{
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			cout << "Please enter an integer\n" << endl;
-		}
+		searchType = getIntInput(1, 4);
 	}
 	getline(cin, trash);
-
-	if (searchType == 4) {
-		return;
-	}
-
 	if (searchType == 1) {
 		string name;
 		cout << "Enter the name of the item: ";
 		getline(cin, name);
 		cout << endl;
-		Item* tempItem = lib.searchItemByName(name);
-		printFound(tempItem);
-		cout << endl;
+		return lib.getItemsByName(name);
 	}
 	else if (searchType == 2) {
 		int type;
 		type = selectItemType();
 		cout << "\nCategory Selected: " << lib.itemTypeToString(type) << endl;
-		lib.printItemsByType(type);
+		return lib.getItemsByType(type);
 	}
 	else if (searchType == 3) {
 		string author;
 		cout << "Enter the name of the author: ";
 		getline(cin, author);
 		cout << endl;
-		Item* tempItem = lib.searchItemByAuthor(author);
-		printFound(tempItem);
-		cout << endl;
+		return lib.getItemsByAuthor(author);
+		
 	}
+	vector<Item*> empty;
+	return empty;
 }
 
-void printFound(Item * tempItem)
+void printFoundItems(vector<Item*> vect)
 {
-	if (tempItem == NULL) {
-		cout << "Item not found." << endl;
+	if (vect.size() == 0) {
+		cout << "Item not found.\n" << endl;
 	}
 	else {
-		cout << "Item found!" << endl;
-		tempItem->print();
+		cout << "Item(s) found!" << endl;
+		for (size_t i = 0; i < vect.size(); i++) {
+			vect[i]->print();
+		}
 	}
 }
 
-int selectItemType() {
-	int type = -1;
+int selectItemType() { //TEST
+	int type = NULL;
 	string trash = "";
-	while (type < 1 || type > 4) {
+	while (type == NULL) {
 		printTypeMenu();
 		cout << "Enter an item type: ";
-		cin >> type;
-		if (cin.fail())
-		{
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			cout << "Please enter an integer\n" << endl;
-		}
+		type = getIntInput(1, 4);
 	}
 	getline(cin, trash);
 	return type;
@@ -191,14 +217,28 @@ void printTypeMenu() {
 	cout << endl;
 }
 
-
-
-void checkOut() {
-
+int getIntInput() {
+	int x;
+	cin >> x;
+	cout << endl;
+	if (cin.fail())
+	{
+		x = NULL;
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Please enter an integer\n" << endl;
+	}
+	return x;
 }
 
-void checkIn() {
-
+int getIntInput(int lower, int upper) {
+	int x;
+	x = getIntInput();
+	if (x < lower || x > upper) {
+		x = NULL;
+		cout << "Number out of range\n" << endl;
+	}
+	return x;
 }
 
 int main()

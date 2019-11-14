@@ -22,7 +22,7 @@ Item::~Item() {
 void Item::print() const{
 
 	cout << "ID: " << setw(5) << left << id;
-	cout << "Name: " << setw(25) << name;
+	cout << "Name: " << setw(30) << name;
 	cout << "Status: " << setw(15) << (status? "Checked in": "Checked out");
 }
 
@@ -36,4 +36,8 @@ string Item::getName() const {
 
 bool Item::getStatus() const {
 	return status;
+}
+
+void Item::setStatus(bool s) {
+	status = s;
 }

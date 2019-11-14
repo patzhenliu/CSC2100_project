@@ -21,6 +21,11 @@ void Book::writeToFile(string fileName) {
 			<< fileName << "'." << endl << endl;
 	}
 	outFile << itemType << ";" << Item::getId() << ";" << Item::getName() << ";" << Item::getStatus() << ";" << authorName << ";\n";
+	outFile.close();
+}
+
+string Book::toString() {
+	return (to_string(itemType) + ";" + to_string(Item::getId()) + ";" + Item::getName() + ";" + to_string(Item::getStatus()) + ";" + authorName + ";\n");
 }
 
 void Book::print() const{

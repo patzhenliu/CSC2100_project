@@ -22,6 +22,11 @@ void Journal::writeToFile(string fileName) {
 			<< fileName << "'." << endl << endl;
 	}
 	outFile << itemType << ";" << Item::getId() << ";" << Item::getName() << ";" << Item::getStatus() << ";" << volume << ";\n";
+	outFile.close();
+}
+
+string Journal::toString() {
+	return (to_string(itemType) + ";" + to_string(Item::getId()) + ";" + Item::getName() + ";" + to_string(Item::getStatus()) + ";" + to_string(volume) + ";\n");
 }
 
 void Journal::print() const{

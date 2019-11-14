@@ -17,6 +17,7 @@ public:
 	virtual void writeToFile(string);
 	virtual void print() const;
 	virtual int getType() const;
+	virtual string toString();
 
 private:
 	int issueNumber;

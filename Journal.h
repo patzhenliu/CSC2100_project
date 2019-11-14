@@ -18,6 +18,8 @@ public:
 	virtual void print() const;
 	virtual int getType() const;
 
+	virtual string toString();
+
 private:
 	int volume;
 	const int itemType = 2;

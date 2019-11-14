@@ -22,6 +22,11 @@ void Magazine::writeToFile(string fileName) {
 			<< fileName << "'." << endl << endl;
 	}
 	outFile << itemType << ";" << Item::getId() << ";" << Item::getName() << ";" << Item::getStatus() << ";" << issueNumber << ";\n";
+	outFile.close();
+}
+
+string Magazine::toString() {
+	return (to_string(itemType) + ";" + to_string(Item::getId()) + ";" + Item::getName() + ";" + to_string(Item::getStatus()) + ";" + to_string(issueNumber) + ";\n");
 }
 
 void Magazine::print() const{

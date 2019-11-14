@@ -19,24 +19,32 @@ class Library
 {
 public:
 	Library();
+	~Library();
 	
-	void printItemsByType(int);
+	vector<Item*> getItemsByType(int);
 	string itemTypeToString(int);
-	Item* searchItemByName(string);
-	Item* searchItemByAuthor(string);
+	vector<Item*> getItemsByName(string); // print
+	vector<Item*> getItemsByAuthor(string); // print
 	void addItem(int, string, string);
 
-	void addToItems(int type, int id, std::string &name, bool status, std::string &other);
-	
+	void addToItems(int, int, string, bool, string);
+	Item* getItem(int) const;
 	vector<Item*> getItems() const;
 	void printItems() const;
-
+	bool isCheckedIn(int);
+	void checkOut(int);
+	void checkIn(int);
+	int getSize() const;
+	
 	enum itemType { NONE, BOOK, JOURNAL, MAGAZINE };
 
 private:
 	const string fileName = "Catalog.txt";
 	vector<Item*> items;
+
 	void createCatalog();
+	void save();
+	string toUpper(string);
 };
 
 #endif

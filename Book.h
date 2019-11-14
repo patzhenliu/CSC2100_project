@@ -18,6 +18,7 @@ public:
 	virtual void print() const;
 	virtual int getType() const;
 	string getAuthor() const;
+	virtual string toString();
 
 private:
 	string authorName;

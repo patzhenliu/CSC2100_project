@@ -6,15 +6,22 @@ Library::Library() {
 	
 }
 
+Library::~Library() {
+	//cout << "DESTRUCTOR WAS CALLED" << endl; //[DELETE LATER]
+	/*for (size_t i = 0; i < items.size(); i++) {
+		delete items[i];
+		items[i] = 0;
+	}*/
+}
 
-
-void Library::printItemsByType(int type) {
+vector<Item*> Library::getItemsByType(int type) {
+	vector<Item*> vect;
 	for (size_t i = 0; i < items.size(); i++) {
 		if (items[i]->getType() == type) {
-			items[i]->print();
+			vect.push_back(items[i]);
 		}
 	}
-	cout << endl;
+	return vect;
 }
 
 string Library::itemTypeToString(int type) {
@@ -32,25 +39,27 @@ string Library::itemTypeToString(int type) {
 	}
 }
 
-Item* Library::searchItemByName(string name) {
+vector<Item*> Library::getItemsByName(string name) {
+	vector<Item*> vect;
 	for (size_t i = 0; i < items.size(); i++) {
-		if (items[i]->getName() == name) {
-			return items[i];
+		if (toUpper(items[i]->getName()) == toUpper(name)) {
+			vect.push_back(items[i]);
 		}
 	}
-	return NULL;
+	return vect;
 }
 
-Item* Library::searchItemByAuthor(string author) {
+vector<Item*> Library::getItemsByAuthor(string author) {
+	vector<Item*> vect;
 	for (size_t i = 0; i < items.size(); i++) {
 		if (items[i]->getType() == BOOK) {
 			Book* b = static_cast<Book*>(items[i]);
-			if (b->getAuthor() == author) {
-				return items[i];
+			if (toUpper(b->getAuthor()) == toUpper(author)) {
+				vect.push_back(items[i]);
 			}
 		}
 	}
-	return NULL;
+	return vect; //is calling destructor here, how to fix
 }
 
 void Library::createCatalog() { //items from text file to vector
@@ -90,6 +99,7 @@ void Library::createCatalog() { //items from text file to vector
 			//cout << e.what() << endl;
 		}
 	}
+	inFile.close();
 }
 
 
@@ -104,7 +114,7 @@ void Library::addItem(int type, string name, string other) { //add new item
 
 }
 
-void Library::addToItems(int type, int id, std::string &name, bool status, std::string &other)
+void Library::addToItems(int type, int id, string name, bool status, string other)
 {
 	if (type == BOOK) {
 		Book* b = new Book(id, name, status, other);
@@ -124,9 +134,47 @@ vector<Item*> Library::getItems() const {
 	return items;
 }
 
+Item* Library::getItem(int index) const {
+	return items[index];
+}
+
 void Library::printItems() const{
 	for (size_t i = 0; i < items.size(); i++) {
 		items[i]->print();
 	}
 	cout << endl;
+}
+
+void Library::save() {
+	ofstream outFile;
+	outFile.open(fileName);
+	for (size_t i = 0; i < items.size(); i++) {
+		outFile << items[i]->toString();
+	}
+	outFile.close();
+}
+
+string Library::toUpper(string s) {
+	for (int i = 0; i < s.size(); i++) {
+		s[i] = toupper(s[i]);
+	}
+	return s;
+}
+
+bool Library::isCheckedIn(int id) {
+	return items[id]->getStatus();
+}
+
+void Library::checkOut(int id) {
+	items[id]->setStatus(false);
+	save();
+}
+
+void Library::checkIn(int id) {
+	items[id]->setStatus(true);
+	save();
+}
+
+int Library::getSize() const {
+	return items.size();
 }
