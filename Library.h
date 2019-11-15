@@ -45,6 +45,7 @@ private:
 	void createCatalog();
 	void save();
 	string toUpper(string);
+	string getLineUntil(ifstream &inFile);
 };
 
 #endif

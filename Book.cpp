@@ -20,12 +20,13 @@ void Book::writeToFile(string fileName) {
 		cout << "Error: unable to open file '"
 			<< fileName << "'." << endl << endl;
 	}
-	outFile << itemType << ";" << Item::getId() << ";" << Item::getName() << ";" << Item::getStatus() << ";" << authorName << ";\n";
+	cout << toString();
+	outFile << toString();
 	outFile.close();
 }
 
 string Book::toString() {
-	return (to_string(itemType) + ";" + to_string(Item::getId()) + ";" + Item::getName() + ";" + to_string(Item::getStatus()) + ";" + authorName + ";\n");
+	return (to_string(itemType) + ";" + Item::toString() + Item::fix(authorName) + ";\n");
 }
 
 void Book::print() const{
@@ -40,3 +41,4 @@ int Book::getType() const {
 string Book::getAuthor() const {
 	return authorName;
 }
+

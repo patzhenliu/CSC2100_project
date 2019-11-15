@@ -21,12 +21,12 @@ void Journal::writeToFile(string fileName) {
 		cout << "Error: unable to open file '"
 			<< fileName << "'." << endl << endl;
 	}
-	outFile << itemType << ";" << Item::getId() << ";" << Item::getName() << ";" << Item::getStatus() << ";" << volume << ";\n";
+	outFile << toString();
 	outFile.close();
 }
 
 string Journal::toString() {
-	return (to_string(itemType) + ";" + to_string(Item::getId()) + ";" + Item::getName() + ";" + to_string(Item::getStatus()) + ";" + to_string(volume) + ";\n");
+	return (to_string(itemType) + ";" + Item::toString() + to_string(volume) + ";\n");
 }
 
 void Journal::print() const{

@@ -21,12 +21,12 @@ void Magazine::writeToFile(string fileName) {
 		cout << "Error: unable to open file '"
 			<< fileName << "'." << endl << endl;
 	}
-	outFile << itemType << ";" << Item::getId() << ";" << Item::getName() << ";" << Item::getStatus() << ";" << issueNumber << ";\n";
+	outFile << toString();
 	outFile.close();
 }
 
 string Magazine::toString() {
-	return (to_string(itemType) + ";" + to_string(Item::getId()) + ";" + Item::getName() + ";" + to_string(Item::getStatus()) + ";" + to_string(issueNumber) + ";\n");
+	return (to_string(itemType) + ";" + Item::toString() + to_string(issueNumber) + ";\n");
 }
 
 void Magazine::print() const{

@@ -7,11 +7,10 @@ Library::Library() {
 }
 
 Library::~Library() {
-	//cout << "DESTRUCTOR WAS CALLED" << endl; //[DELETE LATER]
-	/*for (size_t i = 0; i < items.size(); i++) {
+	for (size_t i = 0; i < items.size(); i++) {
 		delete items[i];
 		items[i] = 0;
-	}*/
+	}
 }
 
 vector<Item*> Library::getItemsByType(int type) {
@@ -42,7 +41,7 @@ string Library::itemTypeToString(int type) {
 vector<Item*> Library::getItemsByName(string name) {
 	vector<Item*> vect;
 	for (size_t i = 0; i < items.size(); i++) {
-		if (toUpper(items[i]->getName()) == toUpper(name)) {
+		if (toUpper(items[i]->getName()).find(toUpper(name)) != string::npos) {
 			vect.push_back(items[i]);
 		}
 	}
@@ -54,7 +53,7 @@ vector<Item*> Library::getItemsByAuthor(string author) {
 	for (size_t i = 0; i < items.size(); i++) {
 		if (items[i]->getType() == BOOK) {
 			Book* b = static_cast<Book*>(items[i]);
-			if (toUpper(b->getAuthor()) == toUpper(author)) {
+			if (toUpper(b->getAuthor()).find(toUpper(author)) != string::npos) {
 				vect.push_back(items[i]);
 			}
 		}
@@ -70,7 +69,6 @@ void Library::createCatalog() { //items from text file to vector
 	string other;
 
 	ifstream inFile;
-	const string fileName = "Catalog.txt";
 
 	inFile.open(fileName);
 	if (!inFile.is_open()) {
@@ -82,16 +80,14 @@ void Library::createCatalog() { //items from text file to vector
 	while (inFile.good())
 	{
 		try {
-			getline(inFile, line, ';');
+			getline(inFile, line, Item::div);
 			type = stoi(line);
-			getline(inFile, line, ';');
+			getline(inFile, line, Item::div);
 			id = stoi(line);
-			getline(inFile, line, ';');
-			name = line;
-			getline(inFile, line, ';');
+			name = getLineUntil(inFile);
+			getline(inFile, line, Item::div);
 			status = stoi(line);
-			getline(inFile, line, ';');
-			other = line;
+			other = getLineUntil(inFile);
 
 			addToItems(type, id, name, status, other);
 		}
@@ -102,6 +98,19 @@ void Library::createCatalog() { //items from text file to vector
 	inFile.close();
 }
 
+string Library::getLineUntil(ifstream &inFile) {
+	string s = "";
+	string line = "";
+	
+	getline(inFile, s, Item::div);
+	while (s.size() > 0 && s.back() == '\\') {
+		
+		s.back() = Item::div;
+		getline(inFile, line, Item::div);
+		s = s + line;
+	}
+	return s;
+}
 
 void Library::addItem(int type, string name, string other) { //add new item
 
@@ -155,7 +164,7 @@ void Library::save() {
 }
 
 string Library::toUpper(string s) {
-	for (int i = 0; i < s.size(); i++) {
+	for (size_t i = 0; i < s.size(); i++) {
 		s[i] = toupper(s[i]);
 	}
 	return s;

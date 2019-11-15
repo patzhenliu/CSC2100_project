@@ -26,6 +26,26 @@ void Item::print() const{
 	cout << "Status: " << setw(15) << (status? "Checked in": "Checked out");
 }
 
+string Item::toString() {
+	return (to_string(id) + ";" + fix(name) + ";" + to_string(status) + ";");
+}
+
+string Item::findAndReplaceAll(string data, string toSearch, string replaceStr)
+{
+	size_t pos = data.find(toSearch);
+
+	while (pos != std::string::npos)
+	{
+		data.replace(pos, toSearch.size(), replaceStr);
+		pos = data.find(toSearch, pos + replaceStr.size());
+	}
+	return data;
+}
+
+string Item::fix(string s) {
+	return findAndReplaceAll(s, string(1, div), "\\" + string(1, div));
+}
+
 int Item::getId() const {
 	return id;
 }

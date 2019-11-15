@@ -18,26 +18,27 @@ void run();
 void printMenu();
 void printSearchMenu();
 void printFoundItems(vector<Item*>);
-vector<Item*> getSearchItems(Library);
+vector<Item*> getSearchItems(Library&);
 int selectItemType();
 void printTypeMenu();
 void printIsFound(Item*);
 int getIntInput();
 int getIntInput(int, int);
-void checkingIO(Library, bool);
+void checkingIO(Library&, bool);
 void printfLine();
+void runTests();
 
 void printfLine() {
 	cout << setw(50) << setfill('=') << "" << endl << endl;
 	cout << setfill(' ');
 }
 
-void checkingIO(Library lib, bool isCheckingIn) {
+void checkingIO(Library& lib, bool isCheckingIn) {
 	int id;
 	cout << "Enter item ID to return: ";
-	id = getIntInput(-1, lib.getSize());
+	id = getIntInput(0, lib.getSize() - 1);
 
-	if (id != NULL) {
+	if (id != -1) {
 		if (!lib.isCheckedIn(id) && isCheckingIn) { //if checked out and is checking in
 			lib.checkIn(id);
 			cout << "The following item has been returned:" << endl;
@@ -71,7 +72,7 @@ void run() {
 			printfLine();
 			printMenu();
 			cout << "\nPlease select a menu option: ";
-			action = getIntInput();
+			action = getIntInput(1, 6);
 
 			if (action == 1) {
 				vector<Item*> vect = getSearchItems(lib);
@@ -117,6 +118,10 @@ void run() {
 			else if (action == 5) {
 				return;
 			}
+			else if (action == 6) {
+				runTests();
+				
+			}
 		}
 		catch (exception e)
 		{
@@ -125,11 +130,29 @@ void run() {
 			getline(cin, trash);
 		}
 	}
-	for (size_t i = 0; i < lib.getItems().size(); i++) { //was being called too often in Library destructor, FIX
-		delete lib.getItems()[i];
-		lib.getItems()[i] = 0;
-	}
+	//for (size_t i = 0; i < lib.getItems().size(); i++) { //was being called too often in Library destructor, FIX
+	//	delete lib.getItems()[i];
+	//	lib.getItems()[i] = 0;
+	//}
 }
+
+void runTests() { 
+	Book b;
+	cout << "test fix function should return blah\\;blah" << endl;
+	cout << b.fix("blah;blah") << endl;
+
+	cout << "test fix function should return blah\\;blah" << endl;
+	cout << b.findAndReplaceAll("blah;blah", ";", "\\;") << endl;
+
+
+	string s1 = "pat";
+	string s2 = s1;
+	s2[0] = 'P';
+
+	cout << "Test string manipulation" << endl;
+	cout << s1 << " " << s2 << endl;
+}
+
 
 void printMenu() {
 	cout << "1. Search Catalog" << endl;
@@ -148,11 +171,11 @@ void printSearchMenu() {
 	cout << endl;
 }
 
-vector<Item*> getSearchItems(Library lib) { //returns list of items that match
-	int searchType = NULL;
+vector<Item*> getSearchItems(Library &lib) { //returns list of items that match
+	int searchType = -1;
 	string trash = "";
 
-	while (searchType == NULL) {
+	while (searchType == -1) {
 		printSearchMenu();
 		cout << "Enter an option: ";
 		searchType = getIntInput(1, 4);
@@ -197,9 +220,9 @@ void printFoundItems(vector<Item*> vect)
 }
 
 int selectItemType() { //TEST
-	int type = NULL;
+	int type = -1;
 	string trash = "";
-	while (type == NULL) {
+	while (type == -1) {
 		printTypeMenu();
 		cout << "Enter an item type: ";
 		type = getIntInput(1, 4);
@@ -223,7 +246,7 @@ int getIntInput() {
 	cout << endl;
 	if (cin.fail())
 	{
-		x = NULL;
+		x = -1;
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cout << "Please enter an integer\n" << endl;
@@ -235,7 +258,7 @@ int getIntInput(int lower, int upper) {
 	int x;
 	x = getIntInput();
 	if (x < lower || x > upper) {
-		x = NULL;
+		x = -1;
 		cout << "Number out of range\n" << endl;
 	}
 	return x;
